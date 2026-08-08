@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نموذج تسجيل مطعم جديد | Restaurant Setup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e63946;
+      --primary-dark: #c1121f;
+      --accent: #ff9f43;
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --bg-input: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: rgba(230,57,70,0.5);
+      --text: #f1f1f1;
+      --text-secondary: #a0a0a0;
+      --text-muted: #666;
+      --success: #25d366;
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --radius: 16px;
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family: 'Cairo', 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    /* Background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(230,57,70,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,159,67,0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 2rem 0 3rem;
+      animation: fadeInDown 0.6s ease;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(230,57,70,0.15), rgba(230,57,70,0.05));
+      border: 1px solid rgba(230,57,70,0.2);
+      color: var(--primary-light);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+    .header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #fff, #ccc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    /* Progress */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      opacity: 0.4;
+    }
+    .progress-step.active { opacity: 1; }
+    .progress-step.completed { opacity: 0.7; }
+    .progress-step.completed .step-num { background: var(--success); border-color: var(--success); }
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .progress-step.active .step-num {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(230,57,70,0.3);
+    }
+    .step-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .progress-line {
+      width: 24px; height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      animation: fadeInUp 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .card.active::before { opacity: 1; }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .card-title .icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, rgba(230,57,70,0.15), rgba(230,57,70,0.05));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .card-subtitle {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      margin-right: 2.8rem;
+    }
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+    @media (min-width: 640px) {
+      .form-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    label .req { color: var(--primary); }
+    input, select, textarea {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(230,57,70,0.1);
+    }
+    input::placeholder, textarea::placeholder { color: #444; }
+    textarea { min-height: 100px; resize: vertical; }
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 1rem center;
+      padding-left: 2.5rem;
+    }
+    /* Dynamic Lists */
+    .dynamic-list { display: flex; flex-direction: column; gap: 0.8rem; }
+    .dynamic-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.6rem;
+      align-items: end;
+      background: rgba(255,255,255,0.02);
+      padding: 0.8rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      animation: fadeInUp 0.3s ease;
+    }
+    @media (max-width: 640px) {
+      .dynamic-item { grid-template-columns: 1fr; }
+    }
+    .btn-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(230,57,70,0.1);
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+    .btn-icon:hover { background: var(--primary); color: #fff; }
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: 1.5px dashed var(--border);
+      color: var(--text-secondary);
+      padding: 0.7rem 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+    .btn-add:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(230,57,70,0.05);
+    }
+    /* Product Builder */
+    .product-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      animation: fadeInUp 0.3s ease;
+      position: relative;
+    }
+    .product-card .remove-prod {
+      position: absolute;
+      top: 0.8rem;
+      left: 0.8rem;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(230,57,70,0.1);
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    .product-card .remove-prod:hover { background: var(--primary); color: #fff; }
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    @media (max-width: 640px) { .product-grid { grid-template-columns: 1fr; } }
+    .product-grid .form-group:first-child { grid-column: 1 / -1; }
+    /* Navigation Buttons */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn {
+      padding: 0.9rem 2rem;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      border: 1.5px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--text-secondary);
+      color: var(--text);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(230,57,70,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(230,57,70,0.45);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #128c7e);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+    }
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37,211,102,0.45);
+    }
+    /* Step visibility */
+    .step-panel { display: none; animation: fadeInUp 0.4s ease; }
+    .step-panel.active { display: block; }
+    /* Review Panel */
+    .review-section {
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+    .review-section h4 {
+      font-size: 0.9rem;
+      color: var(--primary-light);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .review-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 0.85rem;
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-label { color: var(--text-muted); }
+    .review-value { color: var(--text); font-weight: 600; }
+    /* Output Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      animation: scaleIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { font-size: 1.1rem; }
+    .modal-close {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 1.5rem; cursor: pointer; width: 36px; height: 36px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .modal-close:hover { background: rgba(230,57,70,0.1); color: var(--primary); }
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .output-text {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .modal-footer .btn { flex: 1; min-width: 140px; justify-content: center; }
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity:0; transform: translateY(-20px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform: translateY(20px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; }
+      to { opacity:1; }
+    }
+    @keyframes scaleIn {
+      from { opacity:0; transform: scale(0.95); }
+      to { opacity:1; transform: scale(1); }
+    }
+    /* Mobile */
+    @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      .card { padding: 1.2rem; }
+      .progress-step .step-label { display: none; }
+      .nav-buttons { flex-direction: column-reverse; }
+      .nav-buttons .btn { width: 100%; justify-content: center; }
+      .modal-footer { flex-direction: column; }
+      .modal-footer .btn { width: 100%; }
+    }
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 2000;
+      box-shadow: 0 8px 24px rgba(230,57,70,0.35);
+      opacity: 0;
+      transition: all 0.4s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    /* Hint */
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">🚀 نموذج تسجيل سريع</div>
+    <h1>سجّل مطعمك في دقائق</h1>
+    <p>املأ البيانات التالية وسنقوم بإعداد موقعك الإلكتروني خلال 24 ساعة</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-step active" data-step="0" onclick="goToStep(0)">
+      <div class="step-num">1</div>
+      <span class="step-label">المطعم</span>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" data-step="1" onclick="goToStep(1)">
+      <div class="step-num">2</div>
+      <span class="step-label">التواصل</span>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" data-step="2" onclick="goToStep(2)">
+      <div class="step-num">3</div>
+      <span class="step-label">التوصيل</span>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" data-step="3" onclick="goToStep(3)">
+      <div class="step-num">4</div>
+      <span class="step-label">الأوقات</span>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" data-step="4" onclick="goToStep(4)">
+      <div class="step-num">5</div>
+      <span class="step-label">المنتجات</span>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" data-step="5" onclick="goToStep(5)">
+      <div class="step-num">6</div>
+      <span class="step-label">المراجعة</span>
+    </div>
+  </div>
+
+  <form id="setupForm" onsubmit="return false;">
+
+    <!-- STEP 1: Restaurant Info -->
+    <div class="step-panel active" data-step="0">
+      <div class="card active">
+        <div class="card-title"><span class="icon">🏪</span> معلومات المطعم</div>
+        <div class="card-subtitle">البيانات الأساسية التي ستظهر في الموقع</div>
+        <div class="form-grid cols-2">
+          <div class="form-group full">
+            <label>اسم المطعم الكامل <span class="req">*</span></label>
+            <input type="text" id="r_name" placeholder="مثال: Hot Box Chawarma" required>
+          </div>
+          <div class="form-group">
+            <label>الاسم المختصر</label>
+            <input type="text" id="r_short" placeholder="مثال: Hot Box">
+          </div>
+          <div class="form-group">
+            <label>سنة التأسيس</label>
+            <input type="number" id="r_founded" placeholder="2023" min="1990" max="2030">
+          </div>
+          <div class="form-group full">
+            <label>وصف قصير للمطعم</label>
+            <textarea id="r_desc" placeholder="مثال: أفضل بيتزا وشاورما في المنطقة..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <div></div>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Contact & Location -->
+    <div class="step-panel" data-step="1">
+      <div class="card">
+        <div class="card-title"><span class="icon">📞</span> التواصل والموقع</div>
+        <div class="card-subtitle">كيف يتواصل الزبائن معك؟</div>
+        <div class="form-grid cols-2">
+          <div class="form-group">
+            <label>رقم الهاتف (للعرض) <span class="req">*</span></label>
+            <input type="text" id="c_phoneDisplay" placeholder="07-80-03-10-85" required>
+          </div>
+          <div class="form-group">
+            <label>رقم الواتساب (مع رمز الدولة) <span class="req">*</span></label>
+            <input type="text" id="c_phoneHref" placeholder="+213780031085" required>
+            <div class="hint">ℹ ابدأ بـ +213 ثم الرقم بدون صفر</div>
+          </div>
+          <div class="form-group">
+            <label>المدينة <span class="req">*</span></label>
+            <input type="text" id="c_city" placeholder="el Milia" required>
+          </div>
+          <div class="form-group">
+            <label>الولاية <span class="req">*</span></label>
+            <input type="text" id="c_wilaya" placeholder="Jijel" required>
+          </div>
+          <div class="form-group full">
+            <label>العنوان الكامل</label>
+            <input type="text" id="c_address" placeholder="el Milia, Jijel">
+          </div>
+          <div class="section-divider full"></div>
+          <div class="form-group">
+            <label>إنستغرام (اختياري)</label>
+            <input type="text" id="s_insta" placeholder="رابط الحساب أو #">
+          </div>
+          <div class="form-group">
+            <label>فيسبوك (اختياري)</label>
+            <input type="text" id="s_fb" placeholder="رابط الصفحة أو #">
+          </div>
+          <div class="form-group">
+            <label>تيك توك (اختياري)</label>
+            <input type="text" id="s_tiktok" placeholder="رابط الحساب أو #">
+          </div>
+          <div class="form-group">
+            <label>اسم المستخدم</label>
+            <input type="text" id="s_handle" placeholder="@hotboxchawarma">
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">→ السابق</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Delivery Zones -->
+    <div class="step-panel" data-step="2">
+      <div class="card">
+        <div class="card-title"><span class="icon">🛵</span> مناطق التوصيل</div>
+        <div class="card-subtitle">أضف كل منطقة وسعر التوصيل إليها</div>
+        <div id="zonesList" class="dynamic-list">
+          <!-- Dynamic items will be added here -->
+        </div>
+        <button type="button" class="btn-add" onclick="addZone()">+ إضافة منطقة جديدة</button>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">→ السابق</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Working Hours -->
+    <div class="step-panel" data-step="3">
+      <div class="card">
+        <div class="card-title"><span class="icon">🕐</span> أوقات العمل</div>
+        <div class="card-subtitle">متى يكون المطعم مفتوحاً؟</div>
+        <div id="hoursList" class="dynamic-list">
+          <!-- Dynamic items will be added here -->
+        </div>
+        <button type="button" class="btn-add" onclick="addHour()">+ إضافة فترة عمل</button>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">→ السابق</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Products -->
+    <div class="step-panel" data-step="4">
+      <div class="card">
+        <div class="card-title"><span class="icon">🍕</span> قائمة المنتجات</div>
+        <div class="card-subtitle">أضف أطباقك مع السعر والصورة</div>
+        <div id="productsList">
+          <!-- Dynamic product cards -->
+        </div>
+        <button type="button" class="btn-add" onclick="addProduct()">+ إضافة منتج جديد</button>
+        <div class="hint" style="margin-top:1rem;">
+          💡 اكتب 0 في السعر إذا كان متغيراً (مثل العصائر الطازجة)
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">→ السابق</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Review & Submit -->
+    <div class="step-panel" data-step="5">
+      <div class="card">
+        <div class="card-title"><span class="icon">✅</span> مراجعة البيانات</div>
+        <div class="card-subtitle">تأكد من صحة المعلومات قبل الإرسال</div>
+        <div id="reviewContent"></div>
+      </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">→ السابق</button>
+        <button type="button" class="btn btn-success" onclick="submitForm()">🚀 إرسال الطلب</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Output Modal -->
+<div class="modal-overlay" id="outputModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📦 بيانات العميل جاهزة للإرسال</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">
+        انسخ البيانات التالية وأرسلها عبر واتساب أو البريد:
+      </p>
+      <div class="output-text" id="outputText"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="copyOutput()">📋 نسخ الكل</button>
+      <button class="btn btn-success" onclick="sendWhatsApp()">📱 إرسال واتساب</button>
+      <button class="btn btn-primary" onclick="sendEmail()">📧 إرسال بريد</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== STATE =====================
+let currentStep = 0;
+const totalSteps = 6;
+let zoneCount = 0;
+let hourCount = 0;
+let productCount = 0;
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  addZone();
+  addZone();
+  addHour();
+  addProduct();
+  updateProgress();
+});
+
+// ===================== NAVIGATION =====================
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep < totalSteps - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+}
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
+function goToStep(step) {
+  if (step < currentStep || validateStep(currentStep)) {
+    currentStep = step;
+    showStep(currentStep);
+  }
+}
+function showStep(step) {
+  document.querySelectorAll('.step-panel').forEach((panel, i) => {
+    panel.classList.toggle('active', i === step);
+  });
+  document.querySelectorAll('.card').forEach((card, i) => {
+    card.classList.toggle('active', i === step);
+  });
+  updateProgress();
+  if (step === 5) generateReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProgress() {
+  document.querySelectorAll('.progress-step').forEach((el, i) => {
+    el.classList.remove('active', 'completed');
+    if (i === currentStep) el.classList.add('active');
+    else if (i < currentStep) el.classList.add('completed');
+  });
+}
+function validateStep(step) {
+  const panel = document.querySelector(`.step-panel[data-step="${step}"]`);
+  const required = panel.querySelectorAll('input[required], textarea[required]');
+  for (const field of required) {
+    if (!field.value.trim()) {
+      field.focus();
+      field.style.borderColor = 'var(--primary)';
+      setTimeout(() => field.style.borderColor = '', 2000);
+      showToast('⚠️ يرجى ملء جميع الحقول المطلوبة');
+      return false;
+    }
+  }
+  return true;
+}
+
+// ===================== ZONES =====================
+function addZone() {
+  zoneCount++;
+  const div = document.createElement('div');
+  div.className = 'dynamic-item';
+  div.dataset.zoneId = zoneCount;
+  div.innerHTML = `
+    <div class="form-group" style="margin:0;">
+      <label style="font-size:0.75rem;">اسم المنطقة</label>
+      <input type="text" class="z-name" placeholder="مثال: Centre-ville" required>
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label style="font-size:0.75rem;">سعر التوصيل (دينار)</label>
+      <input type="number" class="z-fee" placeholder="0" min="0" required>
+    </div>
+    <button type="button" class="btn-icon" onclick="removeZone(${zoneCount})" title="حذف">🗑</button>
+  `;
+  document.getElementById('zonesList').appendChild(div);
+}
+function removeZone(id) {
+  const el = document.querySelector(`[data-zone-id="${id}"]`);
+  if (el) { el.remove(); showToast('🗑 تم الحذف'); }
+}
+
+// ===================== HOURS =====================
+function addHour() {
+  hourCount++;
+  const div = document.createElement('div');
+  div.className = 'dynamic-item';
+  div.dataset.hourId = hourCount;
+  div.innerHTML = `
+    <div class="form-group" style="margin:0;">
+      <label style="font-size:0.75rem;">الأيام</label>
+      <input type="text" class="h-days" placeholder="مثال: Lundi - Jeudi" required>
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label style="font-size:0.75rem;">الوقت</label>
+      <input type="text" class="h-time" placeholder="مثال: 10:00 - 22:00" required>
+    </div>
+    <button type="button" class="btn-icon" onclick="removeHour(${hourCount})" title="حذف">🗑</button>
+  `;
+  document.getElementById('hoursList').appendChild(div);
+}
+function removeHour(id) {
+  const el = document.querySelector(`[data-hour-id="${id}"]`);
+  if (el) { el.remove(); showToast('🗑 تم الحذف'); }
+}
+
+// ===================== PRODUCTS =====================
+function addProduct() {
+  productCount++;
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.dataset.prodId = productCount;
+  div.innerHTML = `
+    <button type="button" class="remove-prod" onclick="removeProduct(${productCount})">×</button>
+    <div class="product-grid">
+      <div class="form-group" style="margin:0;">
+        <label style="font-size:0.78rem;">اسم المنتج <span class="req">*</span></label>
+        <input type="text" class="p-name" placeholder="مثال: Pizza Viande" required>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label style="font-size:0.78rem;">السعر (دينار) <span class="req">*</span></label>
+        <input type="number" class="p-price" placeholder="400" min="0" required>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label style="font-size:0.78rem;">التصنيف <span class="req">*</span></label>
+        <select class="p-cat" required>
+          <option value="">اختر...</option>
+          <option value="pizza">🍕 بيتزا</option>
+          <option value="tacos">🌮 تاكوس</option>
+          <option value="sandwich">🥪 سندويش</option>
+          <option value="burger">🍔 برغر</option>
+          <option value="crepe">🥞 كريب</option>
+          <option value="konafa">🍮 كنافة</option>
+          <option value="boisson">🥤 مشروب</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label style="font-size:0.78rem;">اسم ملف الصورة</label>
+        <input type="text" class="p-img" placeholder="viande.jpeg">
+        <div class="hint">ℹ اسم الملف فقط مع الامتداد</div>
+      </div>
+      <div class="form-group" style="margin:0; grid-column:1/-1;">
+        <label style="font-size:0.78rem;">وصف قصير</label>
+        <input type="text" class="p-desc" placeholder="وصف المنتج...">
+      </div>
+    </div>
+  `;
+  document.getElementById('productsList').appendChild(div);
+}
+function removeProduct(id) {
+  const el = document.querySelector(`[data-prod-id="${id}"]`);
+  if (el) { el.remove(); showToast('🗑 تم الحذف'); }
+}
+
+// ===================== REVIEW =====================
+function generateReview() {
+  const data = collectData();
+  let html = '';
+
+  html += `<div class="review-section">
+    <h4>🏪 المطعم</h4>
+    <div class="review-item"><span class="review-label">الاسم:</span><span class="review-value">${data.restaurant.name}</span></div>
+    <div class="review-item"><span class="review-label">الاسم المختصر:</span><span class="review-value">${data.restaurant.short}</span></div>
+    <div class="review-item"><span class="review-label">التأسيس:</span><span class="review-value">${data.restaurant.founded}</span></div>
+  </div>`;
+
+  html += `<div class="review-section">
+    <h4>📞 التواصل</h4>
+    <div class="review-item"><span class="review-label">الهاتف:</span><span class="review-value">${data.contact.phoneDisplay}</span></div>
+    <div class="review-item"><span class="review-label">المدينة:</span><span class="review-value">${data.contact.city}, ${data.contact.wilaya}</span></div>
+  </div>`;
+
+  html += `<div class="review-section">
+    <h4>🛵 مناطق التوصيل (${data.zones.length})</h4>`;
+  data.zones.forEach(z => {
+    html += `<div class="review-item"><span class="review-label">${z.name}:</span><span class="review-value">${z.fee} دج</span></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="review-section">
+    <h4>🕐 أوقات العمل (${data.hours.length})</h4>`;
+  data.hours.forEach(h => {
+    html += `<div class="review-item"><span class="review-label">${h.days}:</span><span class="review-value">${h.time}</span></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="review-section">
+    <h4>🍕 المنتجات (${data.products.length})</h4>`;
+  data.products.forEach(p => {
+    html += `<div class="review-item"><span class="review-label">${p.name} (${p.cat}):</span><span class="review-value">${p.price > 0 ? p.price + ' دج' : 'متغير'}</span></div>`;
+  });
+  html += `</div>`;
+
+  document.getElementById('reviewContent').innerHTML = html;
+}
+
+// ===================== COLLECT DATA =====================
+function collectData() {
+  const zones = [];
+  document.querySelectorAll('#zonesList .dynamic-item').forEach(el => {
+    const name = el.querySelector('.z-name')?.value.trim();
+    const fee = el.querySelector('.z-fee')?.value;
+    if (name) zones.push({ name, fee: fee || 0 });
+  });
+
+  const hours = [];
+  document.querySelectorAll('#hoursList .dynamic-item').forEach(el => {
+    const days = el.querySelector('.h-days')?.value.trim();
+    const time = el.querySelector('.h-time')?.value.trim();
+    if (days) hours.push({ days, time });
+  });
+
+  const products = [];
+  document.querySelectorAll('#productsList .product-card').forEach(el => {
+    const name = el.querySelector('.p-name')?.value.trim();
+    const price = parseInt(el.querySelector('.p-price')?.value) || 0;
+    const cat = el.querySelector('.p-cat')?.value;
+    const desc = el.querySelector('.p-desc')?.value.trim();
+    const img = el.querySelector('.p-img')?.value.trim();
+    if (name) products.push({ name, price, cat, desc, img });
+  });
+
+  return {
+    restaurant: {
+      name: document.getElementById('r_name')?.value.trim() || '',
+      short: document.getElementById('r_short')?.value.trim() || '',
+      founded: document.getElementById('r_founded')?.value || '',
+      desc: document.getElementById('r_desc')?.value.trim() || ''
+    },
+    contact: {
+      phoneDisplay: document.getElementById('c_phoneDisplay')?.value.trim() || '',
+      phoneHref: document.getElementById('c_phoneHref')?.value.trim() || '',
+      city: document.getElementById('c_city')?.value.trim() || '',
+      wilaya: document.getElementById('c_wilaya')?.value.trim() || '',
+      address: document.getElementById('c_address')?.value.trim() || ''
+    },
+    social: {
+      instagram: document.getElementById('s_insta')?.value.trim() || '#',
+      facebook: document.getElementById('s_fb')?.value.trim() || '#',
+      tiktok: document.getElementById('s_tiktok')?.value.trim() || '#',
+      handle: document.getElementById('s_handle')?.value.trim() || ''
+    },
+    zones, hours, products
+  };
+}
+
+// ===================== SUBMIT =====================
+function submitForm() {
+  const data = collectData();
+  const output = formatOutput(data);
+  document.getElementById('outputText').textContent = output;
+  document.getElementById('outputModal').classList.add('show');
+}
+function formatOutput(data) {
+  let out = `═══════════════════════════════════════\n`;
+  out += `    📦 طلب إنشاء موقع جديد\n`;
+  out += `═══════════════════════════════════════\n\n`;
+
+  out += `【1】معلومات المطعم\n`;
+  out += `───────────────────────────────────────\n`;
+  out += `الاسم الكامل:  ${data.restaurant.name}\n`;
+  out += `الاسم المختصر: ${data.restaurant.short}\n`;
+  out += `سنة التأسيس:   ${data.restaurant.founded}\n`;
+  out += `الوصف:        ${data.restaurant.desc}\n\n`;
+
+  out += `【2】التواصل والموقع\n`;
+  out += `───────────────────────────────────────\n`;
+  out += `الهاتف:       ${data.contact.phoneDisplay}\n`;
+  out += `واتساب:       ${data.contact.phoneHref}\n`;
+  out += `المدينة:      ${data.contact.city}\n`;
+  out += `الولاية:      ${data.contact.wilaya}\n`;
+  out += `العنوان:      ${data.contact.address}\n\n`;
+
+  out += `【3】التواصل الاجتماعي\n`;
+  out += `───────────────────────────────────────\n`;
+  out += `إنستغرام:     ${data.social.instagram}\n`;
+  out += `فيسبوك:       ${data.social.facebook}\n`;
+  out += `تيك توك:      ${data.social.tiktok}\n`;
+  out += `المعرف:       ${data.social.handle}\n\n`;
+
+  out += `【4】مناطق التوصيل (${data.zones.length})\n`;
+  out += `───────────────────────────────────────\n`;
+  data.zones.forEach((z, i) => {
+    out += `${i+1}. ${z.name} → ${z.fee} دج\n`;
+  });
+  out += `\n`;
+
+  out += `【5】أوقات العمل (${data.hours.length})\n`;
+  out += `───────────────────────────────────────\n`;
+  data.hours.forEach((h, i) => {
+    out += `${i+1}. ${h.days} → ${h.time}\n`;
+  });
+  out += `\n`;
+
+  out += `【6】المنتجات (${data.products.length})\n`;
+  out += `───────────────────────────────────────\n`;
+  data.products.forEach((p, i) => {
+    const price = p.price > 0 ? p.price + ' دج' : 'متغير';
+    out += `${i+1}. [${p.cat}] ${p.name} → ${price}\n`;
+    if (p.desc) out += `   وصف: ${p.desc}\n`;
+    if (p.img) out += `   صورة: ${p.img}\n`;
+  });
+
+  out += `\n═══════════════════════════════════════\n`;
+  out += `✅ تم إرسال الطلب بنجاح\n`;
+  out += `═══════════════════════════════════════`;
+
+  return out;
+}
+
+// ===================== MODAL ACTIONS =====================
+function closeModal() {
+  document.getElementById('outputModal').classList.remove('show');
+}
+function copyOutput() {
+  const text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ تم النسخ إلى الحافظة!');
+  });
+}
+function sendWhatsApp() {
+  const text = document.getElementById('outputText').textContent;
+  const encoded = encodeURIComponent(text);
+  // ← غيّر هذا الرقم إلى رقمك الخاص
+  window.open(`https://wa.me/213776866996?text=${encoded}`, '_blank');
+  showToast('📱 جاري فتح واتساب...');
+}
+function sendEmail() {
+  const text = document.getElementById('outputText').textContent;
+  // ← غيّر هذا البريد إلى بريدك الخاص
+  const subject = encodeURIComponent('طلب إنشاء موقع مطعم جديد');
+  const body = encodeURIComponent(text);
+  window.open(`mailto:your-nexorazi12@gmail.com?subject=${subject}&body=${body}`, '_blank');
+  showToast('📧 جاري فتح البريد...');
+}
+
+// ===================== TOAST =====================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ===================== KEYBOARD =====================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+
+</body>
+</html>
